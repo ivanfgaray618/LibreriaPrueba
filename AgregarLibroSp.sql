@@ -1,0 +1,22 @@
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE OBJECT_ID = OBJECT_ID('AgregarLibro') AND type in ('P', 'PC'))
+	EXEC('CREATE PROC AgregarLibro AS BEGIN SET NOCOUNT ON; END')
+GO
+ALTER PROC AgregarLibro
+	@NombreLibro AS VARCHAR(80),
+	@FechaLibro AS DATETIME,
+	@CostoLibro AS DECIMAL,
+	@Autor AS INT,
+	@Error AS INT OUT
+AS
+BEGIN
+BEGIN TRY
+	BEGIN TRAN
+		INSERT INTO Libro VALUES(@NombreLibro,@FechaLibro,@CostoLibro, @Autor)
+		SET @Error = 0
+	COMMIT TRAN
+END TRY
+BEGIN CATCH
+	ROLLBACK TRAN
+	SET @Error = ERROR_NUMBER()
+END CATCH
+END
